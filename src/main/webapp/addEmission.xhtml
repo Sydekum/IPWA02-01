@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Neue Emissionsdaten hinzufügen</title>
+</h:head>
+
+<h:body>
+
+    <f:metadata>
+        <f:viewAction action="#{loginBean.checkAccess}" />
+    </f:metadata>
+
+    <h:form>
+        <h1>Neue Emissionsdaten eintragen</h1>
+
+        <h:panelGrid columns="2" cellpadding="5">
+
+            <h:outputLabel for="country" value="Land:" />
+            <h:selectOneMenu id="country"
+                             value="#{emissionBean.selectedCountry}"
+                             converter="countryConverter"
+                             required="true">
+                <f:selectItems value="#{countrySelectionBean.allCountries}"
+                               var="c"
+                               itemValue="#{c}"
+                               itemLabel="#{c.name}" />
+            </h:selectOneMenu>
+
+            <h:outputLabel for="emission" value="CO2-Emissionen (kt):" />
+            <h:inputText id="emission"
+                         value="#{emissionBean.emission}"
+                         required="true" />
+
+            <h:outputLabel for="date" value="Messdatum:" />
+            <h:inputText id="date"
+                         value="#{emissionBean.measureDate}"
+                         required="true">
+                <f:convertDateTime pattern="yyyy-MM-dd" />
+            </h:inputText>
+
+            <h:outputLabel for="unit" value="Einheit:" />
+            <h:inputText id="unit"
+                         value="#{emissionBean.unit}"
+                         readonly="true" />
+
+
+            <h:outputText value=" " />
+            <h:commandButton value="Speichern" action="#{emissionBean.saveEmission}" />
+        </h:panelGrid>
+
+        <h:messages globalOnly="true" />
+    </h:form>
+
+</h:body>
+</html>
