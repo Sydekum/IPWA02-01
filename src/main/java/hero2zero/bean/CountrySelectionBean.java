@@ -41,13 +41,6 @@ public class CountrySelectionBean implements Serializable {
     }
 
     /**
-     * Duplikat von getCountries(). Könnte entfernt oder umbenannt werden.
-     */
-    public List<Country> getAllCountries() {
-        return countryService.getAllCountries();
-    }
-
-    /**
      * Gibt die vom Benutzer ausgewählte Länder-ID zurück.
      */
     public Integer getSelectedCountryId() {

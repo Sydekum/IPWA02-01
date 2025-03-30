@@ -22,7 +22,7 @@
                              value="#{emissionBean.selectedCountry}"
                              converter="countryConverter"
                              required="true">
-                <f:selectItems value="#{countrySelectionBean.allCountries}"
+                <f:selectItems value="#{countrySelectionBean.countries}"
                                var="c"
                                itemValue="#{c}"
                                itemLabel="#{c.name}" />
