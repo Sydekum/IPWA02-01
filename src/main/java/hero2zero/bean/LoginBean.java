@@ -17,42 +17,22 @@ import java.io.Serializable;
 @SessionScoped
 public class LoginBean implements Serializable {
 
-    /**
-     * Benutzername, der im Login-Formular eingegeben wurde.
-     */
     private String username;
-
-    /**
-     * Passwort, das im Login-Formular eingegeben wurde.
-     * Hinweis: Für zukünftige Erweiterungen Verschlüsselt umsetzen
-     */
     private String password;
-
-    /**
-     * Der aktuell eingeloggte Benutzer (null, wenn niemand eingeloggt ist).
-     */
     private User loggedInUser;
 
-    /**
-     * Service-Klasse zur Benutzerauthentifizierung.
-     */
     @Inject
     private UserService userService;
 
-    // ──────────── Login-Funktion ────────────
+    // ──────────── Login ────────────
 
-    /**
-     * Versucht, den Benutzer mit den eingegebenen Zugangsdaten anzumelden.
-     * Bei Erfolg: Speichert den Benutzer in der Session und leitet weiter.
-     * Bei Misserfolg: Zeigt eine Fehlermeldung an.
-     */
     public String login() {
         try {
             User user = userService.findByUsernameAndPassword(username, password);
 
             if (user != null) {
                 loggedInUser = user;
-                return "addEmission.xhtml?faces-redirect=true"; // Weiterleitung nach Login
+                return "addEmission.xhtml?faces-redirect=true";
             } else {
                 FacesContext.getCurrentInstance().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login fehlgeschlagen", "Benutzername oder Passwort ist ungültig."));
@@ -67,23 +47,15 @@ public class LoginBean implements Serializable {
         }
     }
 
-    // ──────────── Logout-Funktion ────────────
+    // ──────────── Logout ────────────
 
-    /**
-     * Setzt alle Session-Werte zurück und leitet zur Startseite weiter.
-     */
     public String logout() {
-        loggedInUser = null;
-        username = null;
-        password = null;
+        FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
         return "index.xhtml?faces-redirect=true";
     }
 
     // ──────────── Zugriffskontrolle ────────────
 
-    /**
-     * Prüft, ob ein Benutzer eingeloggt ist. Falls nicht, erfolgt eine Weiterleitung zur Login-Seite.
-     */
     public String checkAccess() {
         if (loggedInUser == null) {
             return "index.xhtml?faces-redirect=true";
@@ -113,9 +85,6 @@ public class LoginBean implements Serializable {
         return loggedInUser;
     }
 
-    /**
-     * Gibt zurück, ob aktuell ein Benutzer eingeloggt ist.
-     */
     public boolean isLoggedIn() {
         return loggedInUser != null;
     }

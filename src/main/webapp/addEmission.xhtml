@@ -8,9 +8,19 @@
 
 <h:body>
 
+    <!-- Zugriffsschutz bei Seitenaufruf -->
     <f:metadata>
         <f:viewAction action="#{loginBean.checkAccess}" />
     </f:metadata>
+
+    <!-- Navigationsbereich oben rechts -->
+    <h:panelGroup layout="block" style="text-align: right; margin-bottom: 10px;">
+        <h:link value="Zurück zur Liste" outcome="index.xhtml" />
+        |
+        <h:form style="display:inline;">
+            <h:commandLink value="Logout" action="#{loginBean.logout}" />
+        </h:form>
+    </h:panelGroup>
 
     <h:form>
         <h1>Neue Emissionsdaten eintragen</h1>
@@ -44,7 +54,6 @@
             <h:inputText id="unit"
                          value="#{emissionBean.unit}"
                          readonly="true" />
-
 
             <h:outputText value=" " />
             <h:commandButton value="Speichern" action="#{emissionBean.saveEmission}" />

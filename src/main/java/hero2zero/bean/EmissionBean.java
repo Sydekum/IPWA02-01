@@ -2,13 +2,12 @@ package hero2zero.bean;
 
 import hero2zero.entity.Country;
 import hero2zero.entity.EmissionData;
+import hero2zero.service.EmissionService;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -41,10 +40,10 @@ public class EmissionBean implements Serializable {
     private String unit = "kt";
 
     /**
-     * Statische Initialisierung der EntityManagerFactory für JPA-Zugriffe.
+     * Service-Klasse für Datenbankzugriffe.
      */
-    private static final EntityManagerFactory emf =
-            Persistence.createEntityManagerFactory("hero2zeroPU");
+    @Inject
+    private EmissionService emissionService;
 
     // ──────────── Getter & Setter ────────────
 
@@ -80,46 +79,35 @@ public class EmissionBean implements Serializable {
         this.unit = unit;
     }
 
-    // ──────────── Datenbankoperation ────────────
+    // ──────────── View-Logik ────────────
 
     /**
-     * Speichert die eingegebenen Emissionsdaten in der Datenbank.
+     * Erstellt ein neues EmissionData-Objekt und speichert es über den EmissionService.
      */
     public String saveEmission() {
-        EntityManager em = emf.createEntityManager();
-        try {
-            em.getTransaction().begin();
+        EmissionData data = new EmissionData();
+        data.setCountry(selectedCountry);
+        data.setEmission(emission);
+        data.setMeasureDate(measureDate);
+        data.setUnit(unit);
 
-            // Neues Entity erstellen und befüllen
-            EmissionData data = new EmissionData();
-            data.setCountry(selectedCountry);
-            data.setEmission(emission);
-            data.setMeasureDate(measureDate);
-            data.setUnit(unit);
+        boolean success = emissionService.saveEmission(data);
 
-            // Persistieren
-            em.persist(data);
-            em.getTransaction().commit();
-
-            // Erfolgsmeldung für den Benutzer anzeigen
-            FacesContext.getCurrentInstance().addMessage(null,
+        FacesContext context = FacesContext.getCurrentInstance();
+        if (success) {
+            context.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Gespeichert", "Emissionsdaten wurden erfolgreich gespeichert."));
 
-            return null;
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            // Im Fehlerfall: Rollback & Fehlermeldung
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-
-            FacesContext.getCurrentInstance().addMessage(null,
+            // Eingabefelder zurücksetzen
+            selectedCountry = null;
+            emission = 0.0;
+            measureDate = null;
+            unit = "kt";
+        } else {
+            context.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fehler", "Daten konnten nicht gespeichert werden."));
-
-            return null;
-        } finally {
-            em.close();
         }
+
+        return null;
     }
 }
