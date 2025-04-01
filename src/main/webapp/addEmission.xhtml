@@ -61,6 +61,53 @@
 
         <h:messages globalOnly="true" />
     </h:form>
+    <!-- Nur sichtbar für Admin oder Herausgeber -->
+    <h:panelGroup rendered="#{loginBean.editorOrAdmin}">
+        <h:form id="approvalForm" style="margin-top: 40px;">
+
+            <h2>Offene Emissionsdaten zur Freigabe</h2>
+
+            <h:dataTable value="#{approvalBean.pendingApprovals}" var="a" border="1" cellpadding="5" style="width:100%;">
+
+                <h:column>
+                    <f:facet name="header">Land</f:facet>
+                    #{a.emissionData.country.name}
+                </h:column>
+
+                <h:column>
+                    <f:facet name="header">Datum</f:facet>
+                    <h:outputText value="#{a.emissionData.measureDate}">
+                        <f:convertDateTime pattern="dd.MM.yyyy" />
+                    </h:outputText>
+                </h:column>
+
+                <h:column>
+                    <f:facet name="header">Emission (kt)</f:facet>
+                    #{a.emissionData.emission}
+                </h:column>
+
+                <h:column>
+                    <f:facet name="header">Aktion</f:facet>
+                    <h:panelGroup>
+                        <h:commandButton value="Genehmigen"
+                                         action="#{approvalBean.approve(a)}"
+                                         style="margin-right: 10px;">
+                            <f:ajax render="@form" />
+                        </h:commandButton>
+
+                        <h:commandButton value="Ablehnen"
+                                         action="#{approvalBean.reject(a)}"
+                                         style="background-color:#c00; color:white;">
+                            <f:ajax render="@form" />
+                        </h:commandButton>
+                    </h:panelGroup>
+                </h:column>
+
+            </h:dataTable>
+
+            <h:messages globalOnly="true" style="margin-top: 10px;" />
+        </h:form>
+    </h:panelGroup>
 
 </h:body>
 </html>

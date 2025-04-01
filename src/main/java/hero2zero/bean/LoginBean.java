@@ -11,21 +11,41 @@ import jakarta.faces.context.FacesContext;
 import java.io.Serializable;
 
 /**
- * Bean zur Verwaltung des Logins und der Session eines Benutzers.
+ * Session-Scoped Bean zur Benutzerverwaltung (Login, Logout, Zugriffskontrolle).
+ * Beinhaltet Authentifizierung, Session-Zustand und Rollenprüfung.
  */
 @Named
 @SessionScoped
 public class LoginBean implements Serializable {
 
+    /**
+     * Eingegebener Benutzername im Login-Formular.
+     */
     private String username;
+
+    /**
+     * Eingegebenes Passwort im Login-Formular.
+     * Hinweis: Noch unverschlüsselt gespeichert
+     */
     private String password;
+
+    /**
+     * Der aktuell eingeloggte Benutzer.
+     * Null, wenn keine Authentifizierung erfolgt ist.
+     */
     private User loggedInUser;
 
+    /**
+     * Service zur Benutzerauthentifizierung über die DB.
+     */
     @Inject
     private UserService userService;
 
     // ──────────── Login ────────────
 
+    /**
+     * Führt die Anmeldung anhand der eingegebenen Zugangsdaten durch.
+     */
     public String login() {
         try {
             User user = userService.findByUsernameAndPassword(username, password);
@@ -40,7 +60,6 @@ public class LoginBean implements Serializable {
             }
         } catch (Exception e) {
             e.printStackTrace();
-
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fehler", "Beim Login ist ein Fehler aufgetreten."));
             return null;
@@ -49,6 +68,9 @@ public class LoginBean implements Serializable {
 
     // ──────────── Logout ────────────
 
+    /**
+     * Beendet die Session des Benutzers und leitet zurück zur Startseite.
+     */
     public String logout() {
         FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
         return "index.xhtml?faces-redirect=true";
@@ -56,6 +78,9 @@ public class LoginBean implements Serializable {
 
     // ──────────── Zugriffskontrolle ────────────
 
+    /**
+     * Überprüft, ob der Benutzer angemeldet ist.
+     */
     public String checkAccess() {
         if (loggedInUser == null) {
             return "index.xhtml?faces-redirect=true";
@@ -85,7 +110,20 @@ public class LoginBean implements Serializable {
         return loggedInUser;
     }
 
+    /**
+     * Gibt zurück, ob ein Benutzer aktuell eingeloggt ist.
+     */
     public boolean isLoggedIn() {
         return loggedInUser != null;
+    }
+
+    // ──────────── Rollenprüfung ────────────
+
+    /**
+     * Prüft, ob der eingeloggte Benutzer die Rolle "Admin" oder "Herausgeber" hat.
+     */
+    public boolean isEditorOrAdmin() {
+        return loggedInUser != null &&
+                ("Admin".equals(loggedInUser.getRole()) || "Herausgeber".equals(loggedInUser.getRole()));
     }
 }

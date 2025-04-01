@@ -13,37 +13,44 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * JSF-Backing Bean zur Eingabe und Speicherung von CO₂-Emissionsdaten.
+ * JSF-Backing Bean zur Eingabe und temporären Verwaltung von Emissionsdaten.
+ * Bindet die Nutzereingaben aus dem Formular und übergibt sie an den Service zur Speicherung.
  */
 @Named
 @RequestScoped
 public class EmissionBean implements Serializable {
 
     /**
-     * Vom Benutzer im Frontend ausgewähltes Land.
+     * Das im Formular ausgewählte Land.
      */
     private Country selectedCountry;
 
     /**
-     * Eingetragener Emissionswert in kT.
+     * Vom Nutzer eingegebener Emissionswert in Kilotonnen (kt).
      */
     private double emission;
 
     /**
-     * Datum der Messung.
+     * Datum, an dem die Emission gemessen wurde.
      */
     private Date measureDate;
 
     /**
-     * Einheit des Emissionswerts (Standard: "kt").
+     * Einheit der Emissionsmenge (Standard: "kt").
      */
     private String unit = "kt";
 
     /**
-     * Service-Klasse für Datenbankzugriffe.
+     * Service zur persistenten Speicherung der Emissionsdaten.
      */
     @Inject
     private EmissionService emissionService;
+
+    /**
+     * Referenz auf die ApprovalBean, um nach dem Speichern die Ansicht zu aktualisieren.
+     */
+    @Inject
+    private ApprovalBean approvalBean;
 
     // ──────────── Getter & Setter ────────────
 
@@ -79,10 +86,11 @@ public class EmissionBean implements Serializable {
         this.unit = unit;
     }
 
-    // ──────────── View-Logik ────────────
+    // ──────────── Speicherlogik ────────────
 
     /**
-     * Erstellt ein neues EmissionData-Objekt und speichert es über den EmissionService.
+     * Erstellt ein neues EmissionData-Objekt mit den eingegebenen Werten und übergibt es zur Speicherung.
+     * Nach erfolgreichem Speichern wird die Approval-Übersicht aktualisiert und Eingabefelder zurückgesetzt.
      */
     public String saveEmission() {
         EmissionData data = new EmissionData();
@@ -95,6 +103,9 @@ public class EmissionBean implements Serializable {
 
         FacesContext context = FacesContext.getCurrentInstance();
         if (success) {
+            // Nach Speichern: Approval-Bean aktualisieren (z. B. für Admin-Ansicht)
+            approvalBean.loadPendingApprovals();
+
             context.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Gespeichert", "Emissionsdaten wurden erfolgreich gespeichert."));
 

@@ -11,71 +11,71 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * JSF-Backing Bean zur Auswahl eines Landes und Anzeige der zugehörigen CO₂-Emissionsdaten.
+ * JSF-Backing Bean zur Auswahl eines Landes und Anzeige zugehöriger Emissionsdaten.
  */
 @Named
 @RequestScoped
 public class CountrySelectionBean implements Serializable {
 
     /**
-     * Zugriff auf den CountryService, der die Datenbankabfragen durchführt.
+     * Service für Datenbankzugriffe auf Länder und Emissionsdaten.
      */
     @Inject
     private CountryService countryService;
 
     /**
-     * Vom Benutzer im Frontend ausgewählte Länder-ID (z.B. aus Dropdown).
+     * Die ID des vom Nutzer ausgewählten Landes (aus dem Dropdown).
      */
     private Integer selectedCountryId;
 
     /**
-     * Ergebnisliste der Emissionsdaten für das ausgewählte Land.
+     * Liste der Emissionsdaten des aktuell ausgewählten Landes.
      */
     private List<EmissionData> emissionDataList;
 
     /**
-     * Gibt alle Länder zurück (für Dropdown-Auswahl im Frontend).
+     * Liefert alle Länder, z.B. zur Darstellung im Dropdown-Menü.
      */
     public List<Country> getCountries() {
         return countryService.getAllCountries();
     }
 
     /**
-     * Gibt die vom Benutzer ausgewählte Länder-ID zurück.
+     * Getter für die aktuell ausgewählte Länder-ID.
      */
     public Integer getSelectedCountryId() {
         return selectedCountryId;
     }
 
     /**
-     * Setzt die vom Benutzer ausgewählte Länder-ID.
+     * Setter für die aktuell ausgewählte Länder-ID
      */
     public void setSelectedCountryId(Integer selectedCountryId) {
         this.selectedCountryId = selectedCountryId;
     }
 
     /**
-     * Gibt die Liste der Emissionsdaten für das gewählte Land zurück.
+     * Gibt die Liste der geladenen Emissionsdaten zurück.
      */
     public List<EmissionData> getEmissionDataList() {
         return emissionDataList;
     }
 
     /**
-     * Prüft, ob keine Emissionsdaten vorhanden sind.
+     * Wird im UI verwendet, um festzustellen, ob keine Daten angezeigt werden können.
      */
     public boolean isNoDataAvailable() {
         return emissionDataList == null || emissionDataList.isEmpty();
     }
 
     /**
-     * Methode zur Datenabfrage – wird im Frontend z.B. bei Button-Klick aufgerufen.
-     * Wenn ein Land gewählt ist, werden dessen Emissionsdaten bei Bestätigung geladen.
+     * Lädt die Emissionsdaten für das aktuell ausgewählte Land.
+     * Wird durch Button im Frontend ausgelöst.
      */
     public String fetch() {
         if (selectedCountryId != null) {
-            emissionDataList = countryService.getEmissionDataByCountryId(Long.valueOf(selectedCountryId));
+            emissionDataList = countryService.getApprovedEmissionDataByCountryId(Long.valueOf(selectedCountryId));
         }
-        return null; // bleibt auf der aktuellen Seite
+        return null; // Bleibt auf derselben Seite
     }
 }
