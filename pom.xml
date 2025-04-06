@@ -44,11 +44,5 @@
             <version>4.0.0</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.primefaces</groupId>
-            <artifactId>primefaces</artifactId>
-            <version>13.0.6</version>
-            <classifier>jakarta</classifier>
-        </dependency>
     </dependencies>
 </project>
